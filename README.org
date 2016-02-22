@@ -1,0 +1,29 @@
+WIP.
+
+Get just the glyphs your site needs from a font.
+
+Example use case:
+
+You have: a TTF, OTF, EOT, SVG, WOFF OR WOFF2 font.
+
+You want: a tiny subset of the glyphs.
+
+For example, Font Awesome is awesome, but it's huge:
+
+#+begin_example
+$ du -h ./*
+108K	FontAwesome.otf
+72K	fontawesome-webfont.eot
+360K	fontawesome-webfont.svg
+140K	fontawesome-webfont.ttf
+84K	fontawesome-webfont.woff
+68K	fontawesome-webfont.woff2
+#+end_example
+
+That's a big download if you just want one or two glyphs.
+
+All you need to know is the unicode codepoints of the glyphs you want to keep,
+everything else will be discarded.
+
+There are a bunch of web services that can do this for you, but I wanted
+something more programmatic.
