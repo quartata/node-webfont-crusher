@@ -28,8 +28,8 @@ NAN_METHOD(decode) {
 
   // Create the Woff2 font
   if (!woff2::ConvertWOFF2ToTTF(
-    reinterpret_cast<uint8_t*>(input_data), input_length,
-    reinterpret_cast<const uint8_t*>(output_data), actual_output_length
+    reinterpret_cast<uint8_t*>(output_data), actual_output_length,
+    reinterpret_cast<const uint8_t*>(input_data), input_length
   )) {
     Nan::ThrowError(Nan::Error("Could not convert the given font."));
     return;
