@@ -22,8 +22,10 @@ module.exports = Writer;
  * @param {Object[]|undefined} [config.formats=undefined] An array of strings
  *     representing file formats you want to see in the output directory.  If
  *     undefined all possible conversions will take place.
+ * @param {Function|undefined} [config.callback=undefined] Function that will be
+ *     executed after files have been written.
  */
-function Writer(data, config) {
+function Writer(config) {
   var _formats;
   if (config.formats === undefined) {
     _formats = formats.map(function(value) {
@@ -35,43 +37,47 @@ function Writer(data, config) {
     }.bind(this));
   }
 
+  config.ttfBuffer = new editor.TTFWriter().write(config.data);
+
   _formats.map(function(value) {
     try {
-      value();
+      value(config);
     } catch (error) {
       console.log("Conversion failed.");
       throw(error);
     }
   });
 
-  this.ttfBuffer = new editor.TTFWriter().write(data);
+  if (config.callback) config.callback();
 }
 
-Writer.prototype.eot = function(data, config) {
+Writer.prototype.eot = function(config) {
   fs.writeFileSync(path.join(config.destination, config.basename + ".eot"),
-                   util.toNodeBuffer(editor.ttf2eot(this.ttfBuffer)));
+                   util.toNodeBuffer(editor.ttf2eot(config.ttfBuffer)));
 };
 
-Writer.prototype.otf = function(data, config) {
+Writer.prototype.otf = function(config) {
   // TODO
 };
 
-Writer.prototype.svg = function(data, config) {
+Writer.prototype.svg = function(config) {
   fs.writeFileSync(path.join(config.destination, config.basename + ".svg"),
-                   util.toNodeBuffer(editor.ttf2svg(this.ttfBuffer)));
+                   editor.ttf2svg(config.ttfBuffer));
 };
 
-Writer.prototype.ttf = function(data, config) {
+Writer.prototype.ttf = function(config) {
   fs.writeFileSync(path.join(config.destination, config.basename + ".ttf"),
-                   util.toNodeBuffer(this.ttfBuffer));
+                   util.toNodeBuffer(config.ttfBuffer));
 };
 
-Writer.prototype.woff = function(data, config) {
+Writer.prototype.woff = function(config) {
+  // TODO: woff needs compression with pako.deflate()?
+  // The filesize seems too large.
   fs.writeFileSync(path.join(config.destination, config.basename + ".woff"),
-                   util.toNodeBuffer(editor.ttf2woff(this.ttfBuffer)));
+                   util.toNodeBuffer(editor.ttf2woff(config.ttfBuffer)));
 };
 
-Writer.prototype.woff2 = function(data, config) {
+Writer.prototype.woff2 = function(config) {
   fs.writeFileSync(path.join(config.destination, config.basename + ".woff2"),
-                   woff2.encode(data));
+                   woff2.encode(util.toNodeBuffer(config.ttfBuffer)));
 };

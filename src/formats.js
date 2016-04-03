@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
 module.exports = [
-  "eot",
-  "otf",
-  "svg",
-  "ttf",
-  "woff",
-  "woff2"
+  'eot',
+  'otf',
+  'svg',
+  'ttf',
+  'woff',
+  'woff2'
 ];

@@ -6,7 +6,7 @@ Example use case:
 
 You have: a TTF, OTF, EOT, SVG, WOFF OR WOFF2 font.
 
-You want: a tiny subset of the glyphs.
+You want: a tiny subset of the glyphs in all or some subset of those formats.
 
 For example, Font Awesome is awesome, but it's huge:
 
@@ -28,6 +28,9 @@ everything else will be discarded.
 There are a bunch of web services that can do this for you, but I wanted
 something more programmatic.
 
+Strictly speaking, you don't have to do any crushing.  If you leave
+=config.glyphs= undefined only conversions will take place.
+
 TTF is used as an intermediary for all conversions.
 
 * Special thanks
@@ -35,6 +38,13 @@ TTF is used as an intermediary for all conversions.
   Really this is just a convenience wrapper around a bunch of other tools.  If
   this project is cool it's because these projects exist:
 
-- [[https://github.com/kekee000/fonteditor-core][fonteditor-core]],
+- [[https://github.com/kekee000/fonteditor-core][fonteditor-core]]
+  I can't read Chinese but I think it's the backend for
+  [[http://font.baidu.com/editor/index-en.html][Baidu's online font editor]].
 - [[https://github.com/google/woff2][woff2]]
+  An awesome woff2 encoder/decoder.
 - [[https://github.com/nfroidure/ttf2woff2][ttf2woff2]]
+  This project is a Node wrapper around Google's
+  [[https://github.com/google/woff2][woff2]] project.  It only allows for
+  encoding (I wanted to be able to encode and decode), but I reused a lot of the
+  code for the woff2 wrapper!

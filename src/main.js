@@ -24,6 +24,7 @@ if (argv.input || argv.i) {
     source: (argv.input || argv.i),
     destination: "./out"
   };
+  console.log(config);
 
   new Reader(config);
 }

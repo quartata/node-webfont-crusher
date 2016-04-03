@@ -2,9 +2,11 @@
 
 var Writer = require("./Writer.js");
 
+module.exports = Crusher;
+
 /**
- * @param {Object} data TTF data in fonteditor-core format.
  * @param {Object} config Configuration object.
+ * @param {Object} config.data TTF data in fonteditor-core format.
  * @param {string} config.destination Output directory for generated font files.
  * @param {Object[]|undefined} [config.glyphs=undefined] An array strings or
  *     unicode codepoints (or both) that you want to keep in the output.  Leave
@@ -15,8 +17,10 @@ var Writer = require("./Writer.js");
  * @param {Object[]|undefined} [config.formats=undefined] An array of strings
  *     representing file formats you want to see in the output directory.  If
  *     undefined all possible conversions will take place.
+ * @param {Function|undefined} [config.callback=undefined] Function that will be
+ *     executed after files have been written.
  */
-function Crusher(data, config) {
+function Crusher(config) {
   // Although fonteditor-core supports just getting a subset of glyphs, it still
   // writes some data to the spot that the glyphs not in the subset would have
   // been.  By removing data from the character map and set of glyphs that it
@@ -25,15 +29,15 @@ function Crusher(data, config) {
   if (config.glyphs !== undefined) {
     var cmap = {};
     var glyf = [];
-    Object.keys(data.cmap).forEach(function(value, index) {
+    Object.keys(config.data.cmap).forEach(function(value, index) {
       if (config.glyphs.indexOf(+value) > -1) {
-        cmap[+value] = data.cmap[+value];
-        glyf.push(data.glyf[data.cmap[+value]]);
+        cmap[+value] = config.data.cmap[+value];
+        glyf.push(config.data.glyf[config.data.cmap[+value]]);
       }
     });
-    data.cmap = cmap;
-    data.glyf = glyf;
+    config.data.cmap = cmap;
+    config.data.glyf = glyf;
   }
 
-  new Writer(data, config);
+  new Writer(config);
 }
