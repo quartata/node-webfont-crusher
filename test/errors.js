@@ -27,6 +27,9 @@ test('config.source must be a string.', (t) => {
     source: true
   }), new TypeError(strings.source.notString));
   t.throws(() => new Reader({
+    source: null
+  }), new TypeError(strings.source.notString));
+  t.throws(() => new Reader({
     source: {}
   }), new TypeError(strings.source.notString));
   t.end();
@@ -54,6 +57,10 @@ test('config.destination must be a string.', (t) => {
   t.throws(() => new Reader({
     source: `${sampleFontPath}/fontawesome-webfont.ttf`,
     destination: true
+  }), new TypeError(strings.destination.notString));
+  t.throws(() => new Reader({
+    source: `${sampleFontPath}/fontawesome-webfont.ttf`,
+    destination: null
   }), new TypeError(strings.destination.notString));
   t.throws(() => new Reader({
     source: `${sampleFontPath}/fontawesome-webfont.ttf`,
@@ -243,6 +250,47 @@ test(`Items in config.formats must be in ${formats.join(', ')}.`, (t) => {
       destination: dirPath,
       formats: ['woff2', 'foo', 'bar']
     }), new TypeError(strings.formats.notValidFormat));
+    temp.cleanupSync();
+    t.end();
+  });
+});
+
+test('If config.scss is defined it must be a string.', (t) => {
+  temp.mkdir('webfont-crusher', (err, dirPath) => {
+    t.throws(() => new Reader({
+      source: `${sampleFontPath}/fontawesome-webfont.ttf`,
+      destination: dirPath,
+      scss: 42
+    }), new TypeError(strings.scss.notString));
+    t.throws(() => new Reader({
+      source: `${sampleFontPath}/fontawesome-webfont.ttf`,
+      destination: dirPath,
+      scss: true
+    }), new TypeError(strings.scss.notString));
+    t.throws(() => new Reader({
+      source: `${sampleFontPath}/fontawesome-webfont.ttf`,
+      destination: dirPath,
+      scss: null
+    }), new TypeError(strings.scss.notString));
+    t.throws(() => new Reader({
+      source: `${sampleFontPath}/fontawesome-webfont.ttf`,
+      destination: dirPath,
+      scss: {}
+    }), new TypeError(strings.scss.notString));
+    t.end();
+  });
+});
+
+test('If config.scss is not undefined its parent must be writable.', (t) => {
+  temp.mkdir('webfont-crusher', (err, dirPath) => {
+    t.throws(() => {
+      fs.mkdirSync(path.join(dirPath, 'scss'), 0o444);
+      return new Reader({
+        source: `${sampleFontPath}/fontawesome-webfont.ttf`,
+        destination: dirPath,
+        scss: path.join(path.join(dirPath, 'scss'), 'nothing.scss')
+      });
+    }, new Error(strings.scss.notWriteable));
     temp.cleanupSync();
     t.end();
   });

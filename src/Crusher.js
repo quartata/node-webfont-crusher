@@ -1,8 +1,4 @@
-"use strict";
-
-var Writer = require("./Writer.js");
-
-module.exports = Crusher;
+'use strict';
 
 /**
  * @param {Object} config Configuration object.
@@ -17,27 +13,34 @@ module.exports = Crusher;
  * @param {Object[]|undefined} [config.formats=undefined] An array of strings
  *     representing file formats you want to see in the output directory.  If
  *     undefined all possible conversions will take place.
+ * @param {Object[]|undefined} [config.scss=undefined] If not undefined, the
+ *     path to an SCSS file that will be written.
  * @param {Function|undefined} [config.callback=undefined] Function that will be
  *     executed after files have been written.
  */
-function Crusher(config) {
-  // Although fonteditor-core supports just getting a subset of glyphs, it still
-  // writes some data to the spot that the glyphs not in the subset would have
-  // been.  By removing data from the character map and set of glyphs that it
-  // knows about we can reduce the file size by half for small numbers of
-  // glyphs!
-  if (config.glyphs !== undefined) {
-    var cmap = {};
-    var glyf = [];
-    Object.keys(config.data.cmap).forEach(function(value, index) {
-      if (config.glyphs.indexOf(+value) > -1) {
-        cmap[+value] = config.data.cmap[+value];
-        glyf.push(config.data.glyf[config.data.cmap[+value]]);
-      }
-    });
-    config.data.cmap = cmap;
-    config.data.glyf = glyf;
-  }
+class Crusher {
+  constructor(config) {
+    // Although fonteditor-core supports just getting a subset of glyphs, it
+    // still writes some data to the spot that the glyphs not in the subset
+    // would have been.  By removing data from the character map and set of
+    // glyphs that it knows about we can reduce the file size by half for small
+    // numbers of glyphs!
+    this.config = config;
+    if (config.glyphs !== undefined) {
+      const cmap = {};
+      const glyf = [];
+      Object.keys(config.data.cmap).forEach((value) => {
+        if (config.glyphs.indexOf(+value) > -1) {
+          cmap[+value] = config.data.cmap[+value];
+          glyf.push(config.data.glyf[config.data.cmap[+value]]);
+        }
+      });
+      this.config.data.cmap = cmap;
+      this.config.data.glyf = glyf;
+    }
 
-  new Writer(config);
+    return (new (require('./Writer.js'))(this.config));
+  }
 }
+
+module.exports = Crusher;

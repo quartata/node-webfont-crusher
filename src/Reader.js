@@ -4,15 +4,15 @@ const Crusher = require('./Crusher.js');
 const editor = require('fonteditor-core');
 const formats = require('./formats.js');
 const fs = require('fs');
-const mmmagic = require('mmmagic');
 const mime = require('mime');
 const mkdirp = require('mkdirp');
+const mmmagic = require('mmmagic');
 const path = require('path');
 const punycode = require('punycode');
+const strings = require('./strings.js');
 const temp = require('temp').track();
 const util = require('./util.js');
 const woff2 = require('./woff2.js');
-const strings = require('./strings.js');
 
 /**
  * @param {Object} config Configuration object.
@@ -27,6 +27,8 @@ const strings = require('./strings.js');
  * @param {Object[]|undefined} [config.formats=undefined] An array of strings
  *     representing file formats you want to see in the output directory.  If
  *     undefined all possible conversions will take place.
+ * @param {Object[]|undefined} [config.scss=undefined] If not undefined, the
+ *     path to an SCSS file that will be written.
  * @param {Function|undefined} [config.callback=undefined] Function that will be
  *     executed after files have been written.
  */
@@ -47,8 +49,8 @@ class Reader {
       throw new TypeError(strings.source.notString);
     } else {
       try {
-        if (!fs.lstatSync(fs.realpathSync(util.resolveHome(config.source)))
-            .isFile()) {
+        this.config.source = fs.realpathSync(util.resolveHome(config.source));
+        if (!fs.lstatSync(this.config.source).isFile()) {
           // File is actually a directory or something else.
           throw new TypeError(strings.source.notFile);
         }
@@ -66,21 +68,32 @@ class Reader {
       throw new TypeError(strings.destination.notString);
     } else {
       try {
-        if (!fs.lstatSync(fs.realpathSync(
-          util.resolveHome(config.destination))).isDirectory()) {
+        this.config.destination =
+          fs.realpathSync(util.resolveHome(config.destination));
+        if (!fs.lstatSync(this.config.destination).isDirectory()) {
           // File exists but is not a directory.
           throw new TypeError(strings.destination.notDirectory);
         }
       } catch (e) {
         if (e.code === 'ENOENT' || e.code === 'EACCES') {
           try {
-            mkdirp.sync(config.destination);
+            mkdirp.sync(this.config.destination);
           } catch (e) { // eslint-disable-line no-shadow
             throw new Error(strings.destination.notWriteable);
           }
         } else {
           throw e;
         }
+      }
+
+      // If we got this far the directory definitely exists.  Make sure we can
+      // write to it.
+      try {
+        fs.accessSync(this.config.destination, fs.W_OK);
+      } catch (e) {
+        if (e.code === 'ENOENT' || e.code === 'EACCES') {
+          throw new Error(strings.destination.notWriteable);
+        } else throw (e);
       }
     }
 
@@ -89,11 +102,12 @@ class Reader {
         throw new TypeError(strings.glyphs.notArray);
       } else if (!(() => {
         for (let i = 0; i < config.glyphs.length; i++) {
-          if ((typeof config.glyphs[i] !== 'number')
-              || (typeof config.glyphs[i] !== 'string')) {
-            return false;
-          } else if (typeof config.glyphs[i] === 'number'
-                     && isNaN(config.glyphs[i])) {
+          if ((typeof config.glyphs[i] === 'number')
+              && !isNaN(config.glyphs[i])) {
+            continue;
+          } else if (typeof config.glyphs[i] === 'string') {
+            continue;
+          } else {
             return false;
           }
         }
@@ -108,6 +122,8 @@ class Reader {
         path.basename(config.source, path.extname(config.source));
     } else if (typeof config.basename !== 'string') {
       throw new TypeError(strings.basename.notString);
+    } else {
+      this.config.basename = config.basename;
     }
 
     if (config.formats !== undefined) {
@@ -140,6 +156,39 @@ class Reader {
           })).sort((a, b) => ((a > b) ? 1 : ((a < b) ? -1 : 0)))
           .filter((element, index, array) =>
                   (index === array.indexOf(element)) ? 1 : 0);
+      }
+    }
+
+    if (config.scss !== undefined) {
+      if (typeof config.scss !== 'string') {
+        throw new TypeError(strings.scss.notString);
+      } else {
+        try {
+          this.config.scss = fs.realpathSync(util.resolveHome(config.scss));
+          if (!fs.lstatSync(path.dirname(this.config.scss)).isDirectory()) {
+            mkdirp.sync(path.dirname(this.config.scss));
+          }
+        } catch (e) {
+          if (e.code === 'ENOENT' || e.code === 'EACCES') {
+            // Either no read permission for the parent or one or more parent
+            // directories didn't exist, try to create them anyway.
+            try {
+              mkdirp.sync(path.dirname(this.config.scss));
+            } catch (e) { // eslint-disable-line no-shadow
+              throw new Error(strings.scss.notWriteable);
+            }
+          } else throw (e);
+        }
+
+        // If we got this far the parent directory definitely exists.  Make sure
+        // we can write to it.
+        try {
+          fs.accessSync(path.dirname(this.config.scss), fs.W_OK);
+        } catch (e) {
+          if (e.code === 'ENOENT' || e.code === 'EACCES') {
+            throw new Error(strings.scss.notWriteable);
+          } else throw (e);
+        }
       }
     }
 
@@ -196,9 +245,7 @@ class Reader {
   }
 
   eot() {
-    // I don't think it's possible to accept eot as an input :(
-    this.config.data = new editor.TTFReader().read(editor.eot2ttf(this.config.data));
-    return new Crusher(this.config);
+    throw new Error('EOT not supported as an input format. :(');
   }
 
   otf() {
@@ -208,9 +255,9 @@ class Reader {
   }
 
   svg() {
-    // TODO - fonteditor-core support for SVG is flaky, look into svg2ttf
-    // https://github.com/fontello/svg2ttf
-    this.config.data = editor.svg2ttfobject(this.config.data);
+    this.config.data = new editor.TTFReader()
+      .read(new editor.TTFWriter()
+            .write(editor.svg2ttfobject(this.config.data)));
     return new Crusher(this.config);
   }
 
@@ -229,10 +276,12 @@ class Reader {
 
   woff2() {
     temp.mkdir('webfont-crusher', (err, dirPath) => {
-      const outputPath = path.join(dirPath, 'output.ttf');
+      // fonteditor-core can't read woff2, so convert to a format that can.
+      const outputPath = path.join(dirPath, 'temp.ttf');
       if (err) throw err;
       fs.writeFileSync(outputPath, woff2.decode(this.config.data));
-      this.config.data = util.toArrayBuffer(fs.readFileSync(outputPath));
+      this.config.data = util.toArrayBuffer(
+        fs.readFileSync(outputPath));
       this.config.data = new editor.TTFReader().read(this.config.data);
       return new Crusher(this.config);
     });

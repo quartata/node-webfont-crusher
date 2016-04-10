@@ -1,13 +1,14 @@
-"use strict";
+'use strict';
 
-var editor = require("fonteditor-core");
-var formats = require("./formats.js");
-var fs = require("fs");
-var path = require("path");
-var util = require("./util.js");
-var woff2 = require("./woff2.js");
+const editor = require('fonteditor-core');
+const formats = require('./formats.js');
+const fs = require('fs');
+const path = require('path');
+const util = require('./util.js');
+const woff2 = require('./woff2.js');
 
-module.exports = Writer;
+editor.string = require.cache[require.resolve('fonteditor-core')]
+  .require('./common/string.js');
 
 /**
  * @param {Object} data TTF data in fonteditor-core format.
@@ -22,62 +23,119 @@ module.exports = Writer;
  * @param {Object[]|undefined} [config.formats=undefined] An array of strings
  *     representing file formats you want to see in the output directory.  If
  *     undefined all possible conversions will take place.
+ * @param {Object[]|undefined} [config.scss=undefined] If not undefined, the
+ *     path to an SCSS file that will be written.
  * @param {Function|undefined} [config.callback=undefined] Function that will be
  *     executed after files have been written.
  */
-function Writer(config) {
-  var _formats;
-  if (config.formats === undefined) {
-    _formats = formats.map(function(value) {
-      return this[value];
-    }.bind(this));
-  } else {
-    _formats = config.formats.map(function(value) {
-      return this[value];
-    }.bind(this));
+class Writer {
+  constructor(config) {
+    this.config = config;
+    let _formats;
+    if (config.formats === undefined) {
+      this.config.formats = formats.filter((format) => format !== 'otf');
+      _formats = this.config.formats.map((value) => this[value]);
+    } else {
+      _formats = config.formats.map((value) => this[value]);
+    }
+
+    // uniqueSubFamily will be used as the ID for SVG output, so make sure that
+    // it is valid.
+    // See: https://www.w3.org/TR/REC-html40/types.html#type-name
+    this.config.data.name.uniqueSubFamily =
+      config.basename.replace(/^[^A-Za-z]/, 'a')
+      .replace(/[^A-Za-z0-9-_:.]/g, '-');
+
+    // Get the unicode range of the font.  This is a bit dumb since it only
+    // looks at the first and last characters (by codepoint), if you specify
+    // only two glyphs that are not contiguous there will be empty space between
+    // them.  It's probably better than nothing.
+    //
+    // See:
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/unicode-range
+    const firstCharIndex = editor.string.pad(
+      this.config.data['OS/2'].usFirstCharIndex.toString(16), 4);
+    const lastCharIndex = editor.string.pad(
+      this.config.data['OS/2'].usLastCharIndex.toString(16), 4);
+    this.config.unicodeRange = `U+${firstCharIndex}-${lastCharIndex}`;
+
+    this.config.ttfBuffer = new editor.TTFWriter().write(this.config.data);
+
+    _formats.forEach((value) => {
+      try {
+        (value.bind(this))();
+      } catch (error) { // eslint-disable-next-line no-console
+        console.log(`${formats[_formats.indexOf(value)]}: Conversion failed.`);
+        throw (error);
+      }
+    });
+
+    if (config.scss) this.scss();
+    if (config.callback) config.callback();
   }
 
-  config.ttfBuffer = new editor.TTFWriter().write(config.data);
+  eot() {
+    fs.writeFileSync(path.join(this.config.destination,
+                               `${this.config.basename}.eot`),
+                     util.toNodeBuffer(editor.ttf2eot(this.config.ttfBuffer)));
+  }
 
-  _formats.map(function(value) {
-    try {
-      value(config);
-    } catch (error) {
-      console.log("Conversion failed.");
-      throw(error);
-    }
-  });
+  otf() {
+    throw new Error('OTF not supported as an output format. :(');
+  }
 
-  if (config.callback) config.callback();
+  svg() {
+    fs.writeFileSync(path.join(this.config.destination,
+                               `${this.config.basename}.svg`),
+                     editor.ttf2svg(this.config.ttfBuffer));
+  }
+
+  ttf() {
+    fs.writeFileSync(path.join(this.config.destination,
+                               `${this.config.basename}.ttf`),
+                     util.toNodeBuffer(
+                       this.config.ttfBuffer));
+  }
+
+  woff() {
+    // TODO: woff needs compression with pako.deflate()?
+    // The filesize seems too large.
+    fs.writeFileSync(path.join(this.config.destination,
+                               `${this.config.basename}.woff`),
+                     util.toNodeBuffer(
+                       editor.ttf2woff(this.config.ttfBuffer)));
+  }
+
+  woff2() {
+    fs.writeFileSync(path.join(this.config.destination,
+                               `${this.config.basename}.woff2`),
+                     woff2.encode(util.toNodeBuffer(
+                       this.config.ttfBuffer)));
+  }
+
+  scss() {
+    // eslint-disable-next-line prefer-template
+    const _formats = this.config.formats.map((extension) => {
+      const format = ((extension === 'eot')
+                    ? 'embedded-opentype'
+                    : ((extension === 'ttf')
+                       ? 'truetype' : extension));
+      return `url("#{$wc-font-path}/${this.config.basename}.${extension}") format(${format})`;
+    }).join(',\n    ') + ';';
+
+    const template = `$wc-font-path: "/${this.config.destination}" !default;
+
+@font-face {
+  font-family: "${this.config.basename}";
+  src: ${_formats}
+  font-weight: normal;
+  font-style: normal;
+  unicode-range: ${this.config.unicodeRange};
+}
+`;
+
+    fs.writeFileSync(this.config.scss, template);
+  }
 }
 
-Writer.prototype.eot = function(config) {
-  fs.writeFileSync(path.join(config.destination, config.basename + ".eot"),
-                   util.toNodeBuffer(editor.ttf2eot(config.ttfBuffer)));
-};
-
-Writer.prototype.otf = function(config) {
-  // TODO
-};
-
-Writer.prototype.svg = function(config) {
-  fs.writeFileSync(path.join(config.destination, config.basename + ".svg"),
-                   editor.ttf2svg(config.ttfBuffer));
-};
-
-Writer.prototype.ttf = function(config) {
-  fs.writeFileSync(path.join(config.destination, config.basename + ".ttf"),
-                   util.toNodeBuffer(config.ttfBuffer));
-};
-
-Writer.prototype.woff = function(config) {
-  // TODO: woff needs compression with pako.deflate()?
-  // The filesize seems too large.
-  fs.writeFileSync(path.join(config.destination, config.basename + ".woff"),
-                   util.toNodeBuffer(editor.ttf2woff(config.ttfBuffer)));
-};
-
-Writer.prototype.woff2 = function(config) {
-  fs.writeFileSync(path.join(config.destination, config.basename + ".woff2"),
-                   woff2.encode(util.toNodeBuffer(config.ttfBuffer)));
-};
+module.exports = Writer;

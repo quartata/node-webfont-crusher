@@ -1,4 +1,4 @@
-var formats = require('./formats.js');
+const formats = require('./formats.js');
 
 module.exports = {
   noConfigurationObject: 'config must be an object.',
@@ -27,6 +27,12 @@ module.exports = {
     notArray: 'If config.formats is not undefined it must be an Array',
     notString: 'Items in config.formats must be of type "string"',
     notValidFormat: `Valid formats are ${formats.join(', ')}.`
+  },
+  scss: {
+    notString: 'If config.scss is not undefined it must be a string.',
+    notWriteable: 'Parent directory of config.scss does not exist and could ' +
+      'not be created. Please check that you have write permissions to the ' +
+      'parent.'
   },
   callback: {
     notFunction: 'If config.callback is not undefined it must be a function.'

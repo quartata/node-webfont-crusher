@@ -33,6 +33,11 @@ Strictly speaking, you don't have to do any crushing.  If you leave
 
 TTF is used as an intermediary for all conversions.
 
+* Caveats
+
+EOT is not supported as an input format and OTF is not supported as an output format.
+
+
 * Special thanks
 
   Really this is just a convenience wrapper around a bunch of other tools.  If

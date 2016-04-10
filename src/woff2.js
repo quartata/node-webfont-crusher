@@ -1,9 +1,11 @@
 'use strict';
 
-function WOFF2() {}
+function woff2() {}
 
 /**
  * Convert WOFF2 data to TTF.
+ *
+ * @static
  *
  * @example
  * var woff2 = require('woff2');
@@ -14,10 +16,12 @@ function WOFF2() {}
  * @param {Buffer} data WOFF2 data to be decoded.
  * @returns {Buffer} Decoded TTF data.
  */
-WOFF2.prototype.decode = require('bindings')('woff2_decode.node').decode;
+woff2.decode = require('bindings')('woff2_decode.node').decode;
 
 /**
  * Convert TTF data to WOFF2.
+ *
+ * @static
  *
  * @example
  * var woff2 = require('woff2');
@@ -28,6 +32,6 @@ WOFF2.prototype.decode = require('bindings')('woff2_decode.node').decode;
  * @param {Buffer} data TTF font data to be encoded.
  * @returns {Buffer} Encoded WOFF2 data.
  */
-WOFF2.prototype.encode = require('bindings')('woff2_encode.node').encode;
+woff2.encode = require('bindings')('woff2_encode.node').encode;
 
-module.exports = WOFF2;
+module.exports = woff2;
