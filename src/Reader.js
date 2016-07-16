@@ -12,7 +12,8 @@ const punycode = require('punycode');
 const strings = require('./strings.js');
 const temp = require('temp').track();
 const util = require('./util.js');
-const woff2 = require('./woff2.js');
+const woff = require('sfnt2woff-zopfli');
+const woff2 = require('woff2');
 
 /**
  * @param {Object} config Configuration object.
@@ -219,7 +220,7 @@ class Reader {
           this.ttf();
           break;
         case 'application/font-woff':
-          this.config.data = util.toArrayBuffer(data);
+          this.config.data = data;
           this.woff();
           break;
         case 'application/font-woff2':
@@ -267,11 +268,15 @@ class Reader {
   }
 
   woff() {
-    this.config.data = new
-    editor.TTFReader().read(editor.woff2ttf(this.config.data, {
-      inflate: require('pako').inflate
-    }));
-    return new Crusher(this.config);
+    temp.mkdir('webfont-crusher', (err, dirPath) => {
+      const outputPath = path.join(dirPath, 'temp.ttf');
+      if (err) throw err;
+      fs.writeFileSync(outputPath, woff.decode(this.config.data));
+      this.config.data = util.toArrayBuffer(
+        fs.readFileSync(outputPath));
+      this.config.data = new editor.TTFReader().read(this.config.data);
+      return new Crusher(this.config);
+    });
   }
 
   woff2() {

@@ -5,7 +5,8 @@ const formats = require('./formats.js');
 const fs = require('fs');
 const path = require('path');
 const util = require('./util.js');
-const woff2 = require('./woff2.js');
+const woff = require('sfnt2woff-zopfli');
+const woff2 = require('woff2');
 
 editor.string = require.cache[require.resolve('fonteditor-core')]
   .require('./common/string.js');
@@ -98,12 +99,10 @@ class Writer {
   }
 
   woff() {
-    // TODO: woff needs compression with pako.deflate()?
-    // The filesize seems too large.
     fs.writeFileSync(path.join(this.config.destination,
                                `${this.config.basename}.woff`),
-                     util.toNodeBuffer(
-                       editor.ttf2woff(this.config.ttfBuffer)));
+                     woff.encode(util.toNodeBuffer(
+                       this.config.ttfBuffer)));
   }
 
   woff2() {

@@ -26,6 +26,8 @@ util.toArrayBuffer = (buffer) => {
 /**
  * Turn an ArrayBuffer into a Node Buffer.
  *
+ * @static
+ *
  * @param {ArrayBuffer} arrayBuffer
  * @returns {Buffer}
  */
@@ -42,6 +44,8 @@ util.toNodeBuffer = (arrayBuffer) => {
  * If a path starts with a tilde or $HOME env var, replace it with the user's
  * home directory.  This is probably not very robust but as far as I can tell
  * Node doesn't offer a similar utility.
+ *
+ * @static
  *
  * @param {string} _path Some filesystem path.
  * @returns {string} The same path with tildes or $HOME env var resolved (if
