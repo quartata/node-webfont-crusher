@@ -1,6 +1,6 @@
 {
   "name": "webfont-crusher",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Get just the glyphs your site needs from a font.",
   "main": "./src/Reader.js",
   "scripts": {
