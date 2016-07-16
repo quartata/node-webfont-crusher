@@ -76,7 +76,7 @@ class Writer {
   }
 
   eot() {
-    fs.writeFileSync(path.join(this.config.destination,
+    fs.writeFileSync(path.join(this.config._destination,
                                `${this.config.basename}.eot`),
                      util.toNodeBuffer(editor.ttf2eot(this.config.ttfBuffer)));
   }
@@ -86,27 +86,27 @@ class Writer {
   }
 
   svg() {
-    fs.writeFileSync(path.join(this.config.destination,
+    fs.writeFileSync(path.join(this.config._destination,
                                `${this.config.basename}.svg`),
                      editor.ttf2svg(this.config.ttfBuffer));
   }
 
   ttf() {
-    fs.writeFileSync(path.join(this.config.destination,
+    fs.writeFileSync(path.join(this.config._destination,
                                `${this.config.basename}.ttf`),
                      util.toNodeBuffer(
                        this.config.ttfBuffer));
   }
 
   woff() {
-    fs.writeFileSync(path.join(this.config.destination,
+    fs.writeFileSync(path.join(this.config._destination,
                                `${this.config.basename}.woff`),
                      woff.encode(util.toNodeBuffer(
                        this.config.ttfBuffer)));
   }
 
   woff2() {
-    fs.writeFileSync(path.join(this.config.destination,
+    fs.writeFileSync(path.join(this.config._destination,
                                `${this.config.basename}.woff2`),
                      woff2.encode(util.toNodeBuffer(
                        this.config.ttfBuffer)));
@@ -122,7 +122,7 @@ class Writer {
       return `url("#{$wc-font-path}/${this.config.basename}.${extension}") format(${format})`;
     }).join(',\n    ') + ';';
 
-    const template = `$wc-font-path: "/${this.config.destination}" !default;
+    const template = `$wc-font-path: "${this.config.destination}" !default;
 
 @font-face {
   font-family: "${this.config.basename}";
@@ -131,6 +131,7 @@ class Writer {
   font-style: normal;
   unicode-range: ${this.config.unicodeRange};
 }
+
 `;
 
     fs.writeFileSync(this.config.scss, template);

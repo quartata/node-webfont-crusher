@@ -69,16 +69,16 @@ class Reader {
       throw new TypeError(strings.destination.notString);
     } else {
       try {
-        this.config.destination =
+        this.config._destination =
           fs.realpathSync(util.resolveHome(config.destination));
-        if (!fs.lstatSync(this.config.destination).isDirectory()) {
+        if (!fs.lstatSync(this.config._destination).isDirectory()) {
           // File exists but is not a directory.
           throw new TypeError(strings.destination.notDirectory);
         }
       } catch (e) {
         if (e.code === 'ENOENT' || e.code === 'EACCES') {
           try {
-            mkdirp.sync(this.config.destination);
+            mkdirp.sync(this.config._destination);
           } catch (e) { // eslint-disable-line no-shadow
             throw new Error(strings.destination.notWriteable);
           }
@@ -90,7 +90,7 @@ class Reader {
       // If we got this far the directory definitely exists.  Make sure we can
       // write to it.
       try {
-        fs.accessSync(this.config.destination, fs.W_OK);
+        fs.accessSync(this.config._destination, fs.W_OK);
       } catch (e) {
         if (e.code === 'ENOENT' || e.code === 'EACCES') {
           throw new Error(strings.destination.notWriteable);
