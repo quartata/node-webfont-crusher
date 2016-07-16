@@ -15,7 +15,7 @@ editor.string = require.cache[require.resolve('fonteditor-core')]
  * @param {Object} data TTF data in fonteditor-core format.
  * @param {Object} config Configuration object.
  * @param {string} config.destination Output directory for generated font files.
- * @param {Object[]|undefined} [config.glyphs=undefined] An array strings or
+ * @param {Object[]|undefined} [config.glyphs=undefined] An array of strings or
  *     unicode codepoints (or both) that you want to keep in the output.  Leave
  *     undefined to keep all glyphs (convert only).
  * @param {string|undefined} [config.basename=undefined] Name that will be given
