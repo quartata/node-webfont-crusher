@@ -78,7 +78,9 @@ class Reader {
       } catch (e) {
         if (e.code === 'ENOENT' || e.code === 'EACCES') {
           try {
-            mkdirp.sync(this.config._destination);
+            const dir = util.resolveHome(config.destination);
+            mkdirp.sync(dir);
+            this.config._destination = fs.realpathSync(dir);
           } catch (e) { // eslint-disable-line no-shadow
             throw new Error(strings.destination.notWriteable);
           }
@@ -116,6 +118,15 @@ class Reader {
       })()) {
         throw new TypeError(strings.glyphs.notNumberOrString);
       }
+
+      this.config.glyphs =
+        [].concat.apply([], config.glyphs.map((element) => {
+          if (typeof element === 'string') {
+            return punycode.ucs2.decode(element);
+          } return element;
+        })).sort((a, b) => ((a > b) ? 1 : ((a < b) ? -1 : 0)))
+        .filter((element, index, array) =>
+                (index === array.indexOf(element)) ? 1 : 0);
     }
 
     if (config.basename === undefined) {
@@ -148,15 +159,6 @@ class Reader {
         return true;
       })()) {
         throw new TypeError(strings.formats.notValidFormat);
-      } else {
-        this.config.formats =
-          [].concat.apply([], config.formats.map((element) => {
-            if (typeof element === 'string') {
-              return punycode.ucs2.decode(element);
-            } return element;
-          })).sort((a, b) => ((a > b) ? 1 : ((a < b) ? -1 : 0)))
-          .filter((element, index, array) =>
-                  (index === array.indexOf(element)) ? 1 : 0);
       }
     }
 
