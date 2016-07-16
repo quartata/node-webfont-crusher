@@ -31,12 +31,13 @@ const argv = require('yargs')
         })
         .argv;
 
-// eslint-disable-next-line no-new
-new Reader({
-  source: (argv.input || argv.i),
-  destination: (argv.output || argv.o),
-  glyphs: (argv.glyphs || argv.g || undefined),
-  basename: (argv.basename || argv.n || undefined),
-  formats: (argv.formats || argv.f || undefined),
-  scss: (argv.scss || argv.s || undefined)
-});
+(() =>
+ new Reader({
+   source: (argv.input || argv.i),
+   destination: (argv.output || argv.o),
+   glyphs: (argv.glyphs || argv.g || undefined),
+   basename: (argv.basename || argv.n || undefined),
+   formats: (argv.formats || argv.f || undefined),
+   scss: (argv.scss || argv.s || undefined)
+ })
+)();

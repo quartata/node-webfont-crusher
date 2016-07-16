@@ -6,6 +6,9 @@
   "scripts": {
     "test": "tap test/*.js"
   },
+  "bin": {
+    "webfont-crusher": "bin/cli.js"
+  },
   "author": {
     "name": "Ruben Maher",
     "email": "r@rkm.id.au",
@@ -25,13 +28,21 @@
     "woff2"
   ],
   "bugs": {
-    "url": "https://github.com/eqyiel/webfont-crusher/issues"
+    "url": "https://github.com/eqyiel/node-webfont-crusher/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eqyiel/webfont-crusher.git"
+    "url": "git+https://github.com/eqyiel/node-webfont-crusher.git"
   },
   "license": "MIT",
+  "files": [
+    "README.md",
+    "Gruntfile.js",
+    "LICENCE",
+    "bin/",
+    "src/",
+    "test/"
+  ],
   "devDependencies": {
     "eslint-config-airbnb": "^6.2.0",
     "grunt": "^1.0.1",
