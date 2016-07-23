@@ -61,7 +61,7 @@ this project is cool it's because these projects exist:
 
   An awesome \`woff2\` encoder/decoder.
 
-- [ttf2woff2](https://github.com/nfroidure/ttf2woff2)
+- [\`ttf2woff2\`](https://github.com/nfroidure/ttf2woff2)
 
   This project is a Node wrapper around Google's
   [\`woff2\`](https://github.com/google/woff2) project.  It only allows for

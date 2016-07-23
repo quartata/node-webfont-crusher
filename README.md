@@ -59,7 +59,7 @@ this project is cool it's because these projects exist:
 
   An awesome `woff2` encoder/decoder.
 
-- [ttf2woff2](https://github.com/nfroidure/ttf2woff2)
+- [`ttf2woff2`](https://github.com/nfroidure/ttf2woff2)
 
   This project is a Node wrapper around Google's
   [`woff2`](https://github.com/google/woff2) project.  It only allows for
@@ -81,7 +81,7 @@ this project is cool it's because these projects exist:
 | config | <code>Object</code> | Configuration object. |
 | config.data | <code>Object</code> | TTF data in fonteditor-core format. |
 | config.destination | <code>string</code> | Output directory for generated font files. |
-| [config.glyphs] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array strings or     unicode codepoints (or both) that you want to keep in the output.  Leave     undefined to keep all glyphs (convert only). |
+| [config.glyphs] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array of strings or     unicode codepoints (or both) that you want to keep in the output.  Leave     undefined to keep all glyphs (convert only). |
 | [config.basename] | <code>string</code> &#124; <code>undefined</code> | Name that will be given     to generated font files.  If undefined it will be the same as the input     file. |
 | [config.formats] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array of strings     representing file formats you want to see in the output directory.  If     undefined all possible conversions will take place. |
 | [config.scss] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | If not undefined, the     path to an SCSS file that will be written. |
@@ -100,7 +100,7 @@ this project is cool it's because these projects exist:
 | config | <code>Object</code> | Configuration object. |
 | config.source | <code>string</code> | Path to the source font file. |
 | config.destination | <code>string</code> | Output directory for generated font files. |
-| [config.glyphs] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array strings or     unicode codepoints (or both) that you want to keep in the output.  Leave     undefined to keep all glyphs (convert only). |
+| [config.glyphs] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array of strings or     unicode codepoints (or both) that you want to keep in the output.  Leave     undefined to keep all glyphs (convert only). |
 | [config.basename] | <code>string</code> &#124; <code>undefined</code> | Name that will be given     to generated font files.  If undefined it will be the same as the input     file. |
 | [config.formats] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array of strings     representing file formats you want to see in the output directory.  If     undefined all possible conversions will take place. |
 | [config.scss] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | If not undefined, the     path to an SCSS file that will be written. |
@@ -119,7 +119,7 @@ this project is cool it's because these projects exist:
 | data | <code>Object</code> | TTF data in fonteditor-core format. |
 | config | <code>Object</code> | Configuration object. |
 | config.destination | <code>string</code> | Output directory for generated font files. |
-| [config.glyphs] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array strings or     unicode codepoints (or both) that you want to keep in the output.  Leave     undefined to keep all glyphs (convert only). |
+| [config.glyphs] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array of strings or     unicode codepoints (or both) that you want to keep in the output.  Leave     undefined to keep all glyphs (convert only). |
 | [config.basename] | <code>string</code> &#124; <code>undefined</code> | Name that will be given     to generated font files.  If undefined it will be the same as the input     file. |
 | [config.formats] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | An array of strings     representing file formats you want to see in the output directory.  If     undefined all possible conversions will take place. |
 | [config.scss] | <code>Array.&lt;Object&gt;</code> &#124; <code>undefined</code> | If not undefined, the     path to an SCSS file that will be written. |
