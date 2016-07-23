@@ -50,40 +50,40 @@ $ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf -o ./
 ### Convert to some specific formats
 
 \`\`\`
-$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \
-  -o ./ \
+$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \\
+  -o ./ \\
   -f woff -f woff2
 \`\`\`
 
 ### Convert to a specific format and crush
 
 \`\`\`
-$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \
-  -o ./ \
-  -g 0xf2ae -g 61459 \
+$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \\
+  -o ./ \\
+  -g 0xf2ae -g 61459 \\
   -f woff2
 
-$ webfont-crusher -i /usr/share/fonts/TTF/DejaVuSansMono.ttf \
-  -o ./ \
-  -g '1234567890.,' \
+$ webfont-crusher -i /usr/share/fonts/TTF/DejaVuSansMono.ttf \\
+  -o ./ \\
+  -g '1234567890.,' \\
   -f woff2
 \`\`\`
 
 ### Convert to a specific format with a different name
 
 \`\`\`
-$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \
-  -o ./ \
-  -f woff2 \
+$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \\
+  -o ./ \\
+  -f woff2 \\
   -n font-awesome
 \`\`\`
 
 ### Convert to a specific formats and get an SCSS partial you can \`@import\`
 
 \`\`\`
-$ webfont-crusher -i /usr/share/fonts/TTF/DejaVuSansMono.ttf \
-  -o ./ \
-  -f woff2 \
+$ webfont-crusher -i /usr/share/fonts/TTF/DejaVuSansMono.ttf \\
+  -o ./ \\
+  -f woff2 \\
   -s ./_fonts.scss
 \`\`\`
 
@@ -124,7 +124,7 @@ this project is cool it's because these projects exist:
 
 # API Reference
 
-{{>all-docs~}};
+{{>all-docs~}}
 `;
 
 module.exports = (grunt) => {
