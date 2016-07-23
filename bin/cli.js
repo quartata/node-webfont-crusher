@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const Reader = require('../src/Reader.js');
+const crush = require('../src/index.js');
 const argv = require('yargs')
         .require('i')
         .alias('i', 'input')
@@ -15,7 +15,7 @@ const argv = require('yargs')
         .alias('f', 'formats')
         .describe('f', 'Desired output formats.')
         .alias('s', 'scss')
-        .describe('s', 'Path to SCSS mixin.')
+        .describe('s', 'Path to SCSS output file.')
         .check((args) => {
           if (Array.isArray(args.i)) {
             throw new TypeError('Please specify one input file only.');
@@ -28,16 +28,17 @@ const argv = require('yargs')
           } else {
             return true;
           }
-        })
-        .argv;
+        }).argv;
 
-(() =>
- new Reader({
-   source: (argv.input || argv.i),
-   destination: (argv.output || argv.o),
-   glyphs: (argv.glyphs || argv.g || undefined),
-   basename: (argv.basename || argv.n || undefined),
-   formats: (argv.formats || argv.f || undefined),
-   scss: (argv.scss || argv.s || undefined)
- })
-)();
+crush({
+  source: (argv.input || argv.i),
+  destination: (argv.output || argv.o),
+  glyphs: (argv.glyphs || argv.g || undefined) === undefined
+    ? undefined
+    : [].concat.apply([], [argv.glyphs || argv.g]),
+  basename: (argv.basename || argv.n || undefined),
+  formats: (argv.formats || argv.f || undefined) === undefined
+    ? undefined
+    : [].concat.apply([], [argv.formats || argv.f]),
+  scss: (argv.scss || argv.s || undefined)
+});

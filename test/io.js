@@ -1,8 +1,8 @@
 'use strict';
 
-const Reader = require('../src/Reader.js');
+const crush = require('../src/index');
 const basePath = './node_modules/font-awesome/fonts';
-const formats = require('../src/formats.js');
+const formats = require('../src/formats');
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
@@ -32,6 +32,6 @@ formats.filter((format) => format !== 'eot')
           t.end();
         },
       };
-      t.ok(new Reader(config));
+      t.ok(crush(config));
     });
   }));

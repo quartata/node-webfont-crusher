@@ -26,20 +26,21 @@ class Crusher {
     // glyphs that it knows about we can reduce the file size by half for small
     // numbers of glyphs!
     this.config = config;
-    if (config.glyphs !== undefined) {
+
+    if (this.config.glyphs !== undefined) {
       const cmap = {};
       const glyf = [];
-      Object.keys(config.data.cmap).forEach((value) => {
-        if (config.glyphs.indexOf(+value) > -1) {
-          cmap[+value] = config.data.cmap[+value];
-          glyf.push(config.data.glyf[config.data.cmap[+value]]);
+      Object.keys(this.config.data.cmap).forEach((value) => {
+        if (this.config.glyphs.indexOf(+value) > -1) {
+          cmap[+value] = this.config.data.cmap[+value];
+          glyf.push(this.config.data.glyf[this.config.data.cmap[+value]]);
         }
       });
       this.config.data.cmap = cmap;
       this.config.data.glyf = glyf;
     }
 
-    return (new (require('./Writer.js'))(this.config));
+    return (new (require('./Writer'))(this.config));
   }
 }
 

@@ -1,35 +1,35 @@
 'use strict';
 
-const Reader = require('../src/Reader.js');
-const formats = require('../src/formats.js');
+const crush = require('../src/index');
+const formats = require('../src/formats');
 const fs = require('fs');
 const path = require('path');
 const sampleFontPath = './node_modules/font-awesome/fonts';
-const strings = require('../src/strings.js');
+const strings = require('../src/strings');
 const temp = require('temp').track();
 const test = require('tap').test;
 
 test('config must be an object.', (t) => {
-  t.throws(() => new Reader(), new TypeError(strings.noConfigurationObject));
+  t.throws(() => crush(), new TypeError(strings.noConfigurationObject));
   t.end();
 });
 
 test('config must have properties source and destination.', (t) => {
-  t.throws(() => new Reader({}), new TypeError(strings.noRequiredArguments));
+  t.throws(() => crush({}), new TypeError(strings.noRequiredArguments));
   t.end();
 });
 
 test('config.source must be a string.', (t) => {
-  t.throws(() => new Reader({
+  t.throws(() => crush({
     source: 42
   }), new TypeError(strings.source.notString));
-  t.throws(() => new Reader({
+  t.throws(() => crush({
     source: true
   }), new TypeError(strings.source.notString));
-  t.throws(() => new Reader({
+  t.throws(() => crush({
     source: null
   }), new TypeError(strings.source.notString));
-  t.throws(() => new Reader({
+  t.throws(() => crush({
     source: {}
   }), new TypeError(strings.source.notString));
   t.end();
@@ -38,10 +38,10 @@ test('config.source must be a string.', (t) => {
 test('config.source must be the path to a file.', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
     if (err) throw err;
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: dirPath
     }), new TypeError(strings.source.notFile));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: path.join(dirPath, 'nothing')
     }), new TypeError(strings.source.notFile));
     temp.cleanupSync();
@@ -50,19 +50,19 @@ test('config.source must be the path to a file.', (t) => {
 });
 
 test('config.destination must be a string.', (t) => {
-  t.throws(() => new Reader({
+  t.throws(() => crush({
     source: `${sampleFontPath}/fontawesome-webfont.ttf`,
     destination: 42
   }), new TypeError(strings.destination.notString));
-  t.throws(() => new Reader({
+  t.throws(() => crush({
     source: `${sampleFontPath}/fontawesome-webfont.ttf`,
     destination: true
   }), new TypeError(strings.destination.notString));
-  t.throws(() => new Reader({
+  t.throws(() => crush({
     source: `${sampleFontPath}/fontawesome-webfont.ttf`,
     destination: null
   }), new TypeError(strings.destination.notString));
-  t.throws(() => new Reader({
+  t.throws(() => crush({
     source: `${sampleFontPath}/fontawesome-webfont.ttf`,
     destination: {}
   }), new TypeError(strings.destination.notString));
@@ -73,7 +73,7 @@ test('config.destination must be a directory.', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
     const tempFile = path.join(dirPath, 'existing-file');
     fs.writeFileSync(tempFile);
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: tempFile
     }), new TypeError(strings.destination.notDirectory));
@@ -87,7 +87,7 @@ test('If config.destination does not exist it must be writable.', (t) => {
     const tempDir = path.join(dirPath, 'tmp');
     t.throws(() => {
       fs.mkdirSync(tempDir, 0o444);
-      return new Reader({
+      return crush({
         source: `${sampleFontPath}/fontawesome-webfont.ttf`,
         destination: (path.join(tempDir, 'nothing'))
       });
@@ -99,22 +99,22 @@ test('If config.destination does not exist it must be writable.', (t) => {
 
 test('If config.glyphs is defined it must be an Array.', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: 42
     }), new TypeError(strings.glyphs.notArray));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: true
     }), new TypeError(strings.glyphs.notArray));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: null
     }), new TypeError(strings.glyphs.notArray));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: {}
@@ -126,27 +126,27 @@ test('If config.glyphs is defined it must be an Array.', (t) => {
 
 test('Items in config.glyphs must be "number" or "string".', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: [NaN]
     }), new TypeError(strings.glyphs.notNumberOrString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: [true]
     }), new TypeError(strings.glyphs.notNumberOrString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: [undefined]
     }), new TypeError(strings.glyphs.notNumberOrString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: [null]
     }), new TypeError(strings.glyphs.notNumberOrString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       glyphs: [{}]
@@ -158,22 +158,22 @@ test('Items in config.glyphs must be "number" or "string".', (t) => {
 
 test('If config.basename is not undefined it must be a string.', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       basename: 42,
     }), new TypeError(strings.basename.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       basename: true
     }), new TypeError(strings.basename.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       basename: null
     }), new TypeError(strings.basename.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       basename: {}
@@ -186,22 +186,22 @@ test('If config.basename is not undefined it must be a string.', (t) => {
 
 test('If config.formats is not undefined it must be an Array.', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: 42
     }), new TypeError(strings.formats.notArray));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: true
     }), new TypeError(strings.formats.notArray));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: null
     }), new TypeError(strings.formats.notArray));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: {}
@@ -213,27 +213,27 @@ test('If config.formats is not undefined it must be an Array.', (t) => {
 
 test('Items in config.formats must be of type "string".', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: [42]
     }), new TypeError(strings.formats.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: [true]
     }), new TypeError(strings.formats.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: [undefined]
     }), new TypeError(strings.formats.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: [null]
     }), new TypeError(strings.formats.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: [{}]
@@ -245,7 +245,7 @@ test('Items in config.formats must be of type "string".', (t) => {
 
 test(`Items in config.formats must be in ${formats.join(', ')}.`, (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       formats: ['woff2', 'foo', 'bar']
@@ -257,22 +257,22 @@ test(`Items in config.formats must be in ${formats.join(', ')}.`, (t) => {
 
 test('If config.scss is defined it must be a string.', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       scss: 42
     }), new TypeError(strings.scss.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       scss: true
     }), new TypeError(strings.scss.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       scss: null
     }), new TypeError(strings.scss.notString));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       scss: {}
@@ -285,7 +285,7 @@ test('If config.scss is not undefined its parent must be writable.', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
     t.throws(() => {
       fs.mkdirSync(path.join(dirPath, 'scss'), 0o444);
-      return new Reader({
+      return crush({
         source: `${sampleFontPath}/fontawesome-webfont.ttf`,
         destination: dirPath,
         scss: path.join(path.join(dirPath, 'scss'), 'nothing.scss')
@@ -298,22 +298,22 @@ test('If config.scss is not undefined its parent must be writable.', (t) => {
 
 test('If config.callback is not undefined it must be a function.', (t) => {
   temp.mkdir('webfont-crusher', (err, dirPath) => {
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       callback: 42
     }), new TypeError(strings.callback.notFunction));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       callback: true
     }), new TypeError(strings.callback.notFunction));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       callback: 'nothing'
     }), new TypeError(strings.callback.notFunction));
-    t.throws(() => new Reader({
+    t.throws(() => crush({
       source: `${sampleFontPath}/fontawesome-webfont.ttf`,
       destination: dirPath,
       callback: {}

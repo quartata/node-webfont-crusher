@@ -1,17 +1,17 @@
 'use strict';
 
-const Crusher = require('./Crusher.js');
+const Crusher = require('./Crusher');
 const editor = require('fonteditor-core');
-const formats = require('./formats.js');
+const formats = require('./formats');
 const fs = require('fs');
 const mime = require('mime');
 const mkdirp = require('mkdirp');
 const mmmagic = require('mmmagic');
 const path = require('path');
 const punycode = require('punycode');
-const strings = require('./strings.js');
+const strings = require('./strings');
 const temp = require('temp').track();
-const util = require('./util.js');
+const util = require('./util');
 const woff = require('sfnt2woff-zopfli');
 const woff2 = require('woff2');
 
@@ -36,7 +36,6 @@ const woff2 = require('woff2');
 class Reader {
   constructor(config) {
     this.config = config;
-    temp.track();
 
     if ((typeof config) !== 'object') {
       throw new TypeError(strings.noConfigurationObject);
@@ -121,9 +120,11 @@ class Reader {
 
       this.config.glyphs =
         [].concat.apply([], config.glyphs.map((element) => {
+          // Allow for any radix that Number supports
+          // eslint-disable-next-line radix
           if (typeof element === 'string') {
             return punycode.ucs2.decode(element);
-          } return element;
+          } return element; // eslint-disable-line radix
         })).sort((a, b) => ((a > b) ? 1 : ((a < b) ? -1 : 0)))
         .filter((element, index, array) =>
                 (index === array.indexOf(element)) ? 1 : 0);

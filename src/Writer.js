@@ -1,15 +1,15 @@
 'use strict';
 
 const editor = require('fonteditor-core');
-const formats = require('./formats.js');
+const formats = require('./formats');
 const fs = require('fs');
 const path = require('path');
-const util = require('./util.js');
+const util = require('./util');
 const woff = require('sfnt2woff-zopfli');
 const woff2 = require('woff2');
 
 editor.string = require.cache[require.resolve('fonteditor-core')]
-  .require('./common/string.js');
+  .require('./common/string');
 
 /**
  * @param {Object} data TTF data in fonteditor-core format.

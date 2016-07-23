@@ -14,12 +14,12 @@ For example, Font Awesome is awesome, but it's also huge:
 
 \`\`\`
 $ du -h ./*
-108K	FontAwesome.otf
-72K	fontawesome-webfont.eot
-360K	fontawesome-webfont.svg
-140K	fontawesome-webfont.ttf
-84K	fontawesome-webfont.woff
-68K	fontawesome-webfont.woff2
+108K FontAwesome.otf
+72K  fontawesome-webfont.eot
+360K fontawesome-webfont.svg
+140K fontawesome-webfont.ttf
+84K  fontawesome-webfont.woff
+68K  fontawesome-webfont.woff2
 \`\`\`
 
 That's a big download if you just want one or two glyphs.
@@ -38,10 +38,64 @@ Strictly speaking, you don't have to do any crushing.  If you leave
 You probably want the Grunt plugin.  Otherwise there's a rudimentary command
 line interface.  Check out \`./bin/cli.js\`.
 
+If you didn't install with \`-g\` you can run \`webfont-crusher\` from your
+\`node_modules\` directory (\`./node_modules/.bin/webfont-crusher\`).
+
+### Just convert
+
+\`\`\`
+$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf -o ./
+\`\`\`
+
+### Convert to some specific formats
+
+\`\`\`
+$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \
+  -o ./ \
+  -f woff -f woff2
+\`\`\`
+
+### Convert to a specific format and crush
+
+\`\`\`
+$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \
+  -o ./ \
+  -g 0xf2ae -g 61459 \
+  -f woff2
+
+$ webfont-crusher -i /usr/share/fonts/TTF/DejaVuSansMono.ttf \
+  -o ./ \
+  -g '1234567890.,' \
+  -f woff2
+\`\`\`
+
+### Convert to a specific format with a different name
+
+\`\`\`
+$ webfont-crusher -i ./node_modules/font-awesome/fonts/FontAwesome.otf \
+  -o ./ \
+  -f woff2 \
+  -n font-awesome
+\`\`\`
+
+### Convert to a specific formats and get an SCSS partial you can \`@import\`
+
+\`\`\`
+$ webfont-crusher -i /usr/share/fonts/TTF/DejaVuSansMono.ttf \
+  -o ./ \
+  -f woff2 \
+  -s ./_fonts.scss
+\`\`\`
+
 ## Caveats
 
-EOT is not supported as an input format and OTF is not supported as an output
-format.
+- EOT is not supported as an input format and OTF is not supported as an output
+  format.
+
+- The command line interface won't let you pass just numbers right now
+  (\`-g '1234567890'\`) because it will be interpreted as a codepoint.  If you
+  really just want numerals a dodgy workaround is just to include a space so
+  that it will be parsed as a string (\`-g ' 1234567890'\`).
 
 ## Special thanks
 
@@ -70,7 +124,8 @@ this project is cool it's because these projects exist:
 
 # API Reference
 
-{{>all-docs~}}`;
+{{>all-docs~}};
+`;
 
 module.exports = (grunt) => {
   grunt.initConfig({

@@ -1,8 +1,8 @@
 {
   "name": "webfont-crusher",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Get just the glyphs your site needs from a font.",
-  "main": "./src/Reader.js",
+  "main": "./src/index.js",
   "scripts": {
     "test": "tap test/*.js"
   },
@@ -45,6 +45,7 @@
   ],
   "devDependencies": {
     "eslint-config-airbnb": "^6.2.0",
+    "font-awesome": "^4.6.3",
     "grunt": "^1.0.1",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-eslint": "^18.0.0",
