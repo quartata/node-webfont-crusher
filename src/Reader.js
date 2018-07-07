@@ -219,14 +219,17 @@ class Reader {
           this.svg();
           break;
         case 'application/x-font-ttf':
+        case 'font/ttf':
           this.config.data = util.toArrayBuffer(data);
           this.ttf();
           break;
         case 'application/font-woff':
+        case 'font/woff':
           this.config.data = data;
           this.woff();
           break;
         case 'application/font-woff2':
+        case 'font/woff2':
           this.config.data = data;
           this.woff2();
           break;
